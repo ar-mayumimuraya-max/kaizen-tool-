@@ -43,7 +43,7 @@ if uploaded_files:
             df = pd.concat(df_list, ignore_index=True)
 
             # ---------------------------------------------------------
-            # パターンA：バリューブックス用（いつものExcel加工）
+            # パターンA：バリューブックス用（Excel出力）
             # ---------------------------------------------------------
             if client_option == "バリューブックス用 (Excel出力)":
                 
@@ -60,9 +60,9 @@ if uploaded_files:
                 }
                 df = df.rename(columns=rename_map)
 
-                # 並び替え
+                # 並び替え（★ここを変更：古い順＝昇順）
                 if 'issue_id' in df.columns:
-                    df = df.sort_values('issue_id', ascending=False)
+                    df = df.sort_values('issue_id', ascending=True)
 
                 # 文字の置き換え
                 if '配信対象' in df.columns:
@@ -106,9 +106,9 @@ if uploaded_files:
             # ---------------------------------------------------------
             elif client_option == "リンクシェア用 (テキスト出力)":
                 
-                # 並び替え（新しい順）
+                # 並び替え（★ここを変更：古い順＝昇順）
                 if 'issue_id' in df.columns:
-                    df = df.sort_values('issue_id', ascending=False)
+                    df = df.sort_values('issue_id', ascending=True)
                 
                 # 日付型変換
                 if 'sent_date' in df.columns:
@@ -121,7 +121,7 @@ if uploaded_files:
                     # データの取得
                     issue_id = row.get('issue_id', '')
                     deliver = row.get('deliver', 0)
-                    click = row.get('click_total', 0) # CSV上の列名は click_total
+                    click = row.get('click_total', 0)
                     date_val = row.get('sent_date', pd.NaT)
 
                     # フォーマット作成
@@ -129,10 +129,10 @@ if uploaded_files:
                     deliver_str = f"{int(deliver):,}" if pd.notnull(deliver) else "0"
                     click_str = f"{int(click):,}" if pd.notnull(click) else "0"
 
-                    # テキストブロックの作成（ここを修正しました）
+                    # テキストブロック
                     text_block = (
                         f"{date_str}配信\n\n"
-                        f"【issueID】{issue_id}\n"  # ここを \n 1つにしました
+                        f"【issueID】{issue_id}\n"
                         f"【Deliver】{deliver_str}\n"
                         f"【Click】{click_str}\n"
                         "--------------------------------------------------"
@@ -148,7 +148,7 @@ if uploaded_files:
                 # コピー用のテキストエリア
                 st.text_area("以下のテキストをコピーして使用してください", final_text, height=400)
                 
-                # テキストファイルとしてダウンロード
+                # ダウンロードボタン
                 st.download_button(
                     label="📥 テキストファイル(.txt)をダウンロード",
                     data=final_text,
